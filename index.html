@@ -117,6 +117,7 @@
   <div class="datebox">
     <span id="dateLabel"></span>
     <input id="day" type="range" step="1" aria-label="Map date">
+    <button class="hbtn" id="todayBtn">Today</button>
     <button class="hbtn" id="tripBtn" hidden></button>
   </div>
   <button class="hbtn" id="infoBtn">ⓘ How it works</button>
@@ -668,6 +669,7 @@ if (tripOn) {
   Object.assign($('#tripBtn'), { hidden: false, textContent: `Trip ${tripLabel}` });
   $('#tripBtn').onclick = () => { offset = tripFrom; $('#day').value = offset; showDay(); };
 }
+$('#todayBtn').onclick = () => { offset = 0; $('#day').value = 0; showDay(); };
 $('#infoBtn').onclick = () => $('#info').classList.add('on');
 $('#infoClose').onclick = () => $('#info').classList.remove('on');
 $('#info').onclick = e => { if (e.target.id === 'info') $('#info').classList.remove('on'); };
