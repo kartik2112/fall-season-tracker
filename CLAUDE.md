@@ -24,7 +24,7 @@ Live at https://kartik2112.github.io/fall-season-tracker/ — GitHub Pages serve
   - The site hotlinks this image with on-map credit; there are no published terms for it.
 - **Maine Forest Service** — ArcGIS FeatureServer layer 2, fields `ZoneName`, `FoliageClass` (`Very Low: 0-10%` … `Peak: 70-100%`, `Past Peak`). Weekly. Geometry is simplified in the query (`maxAllowableOffset=0.01`) to keep it ~100 KB gzipped.
 - **YouTube** — thumbnail `https://i.ytimg.com/vi/<id>/hqdefault_live.jpg` (latest frame); player `youtube-nocookie.com/embed/<id>`. Embeds need an http(s) origin — they fail from `file://`.
-- **Basemap** — Esri `Canvas/World_Light_Gray_Base` + `_Reference` (labels drawn above the foliage layer). CARTO basemaps now demand an API key; don't switch back.
+- **Basemap** — Esri `Canvas/World_Light_Gray_Base` + `_Reference` (labels drawn above the foliage layer), plus `Reference/World_Transportation` as the toggleable roads overlay. CARTO basemaps now demand an API key; don't switch back.
 - No public feed was found for NH; VT and MA were not investigated.
 
 ## Adding or checking cams (fast path)
