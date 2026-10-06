@@ -1,6 +1,6 @@
 # CLAUDE.md — New England Fall Foliage Tracker
 
-One static file, `index.html` (inline CSS + JS, Leaflet 1.9.4 from cdnjs). No build, no backend, no API keys.
+One static page, `index.html` (inline CSS + JS, Leaflet 1.9.4 from cdnjs), plus one data file, `roads.json`. No build, no backend, no API keys.
 Live at https://kartik2112.github.io/fall-season-tracker/ — GitHub Pages serves `main` / root, so **a push to `main` is a deploy** (takes ~1 min; add `?v=N` to bypass the 10-min cache when checking).
 
 ## Where things are in index.html (grep these)
@@ -16,6 +16,7 @@ Live at https://kartik2112.github.io/fall-season-tracker/ — GitHub Pages serve
 | `function loadDay` / `stageAt` | Fetch a day's PNG into a canvas; read the stage under a point |
 | `function tripInfo` / `outlook` | Trip ranking and the "Peak ~Oct 9" line |
 | `function render` / `showDay` | Redraw markers + sidebar; change the displayed day |
+| `ROAD_STYLE`, `roadLines`, `syncRoads` | Static road overlay from `roads.json` |
 | `<div id="info">` | "How it works" panel (summary + SVG system diagram) — update it when data flow changes |
 
 ## Data sources (all fetched by the visitor's browser at page load)
@@ -25,6 +26,7 @@ Live at https://kartik2112.github.io/fall-season-tracker/ — GitHub Pages serve
 - **Maine Forest Service** — ArcGIS FeatureServer layer 2, fields `ZoneName`, `FoliageClass` (`Very Low: 0-10%` … `Peak: 70-100%`, `Past Peak`). Weekly. Geometry is simplified in the query (`maxAllowableOffset=0.01`) to keep it ~100 KB gzipped.
 - **YouTube** — thumbnail `https://i.ytimg.com/vi/<id>/hqdefault_live.jpg` (latest frame); player `youtube-nocookie.com/embed/<id>`. Embeds need an http(s) origin — they fail from `file://`.
 - **Basemap** — Esri `Canvas/World_Light_Gray_Base` + `_Reference` (labels drawn above the foliage layer), plus `Reference/World_Transportation` as the toggleable roads overlay. CARTO basemaps now demand an API key; don't switch back.
+- **Roads** — `roads.json` (~300 KB, ~110 KB gzipped): motorway / trunk / primary lines for the six states, a static OpenStreetMap extract drawn on a canvas with white casing (`ROAD_STYLE`; primary roads appear from zoom 8). Rebuild with `python3 tools/build_roads.py` (Overpass; needs a User-Agent, and only the mail.ru mirror answered this query last time). Esri's `World_Transportation` tiles stay on top for route shields.
 - No public feed was found for NH; VT and MA were not investigated.
 
 ## Adding or checking cams (fast path)
@@ -41,6 +43,6 @@ Live at https://kartik2112.github.io/fall-season-tracker/ — GitHub Pages serve
 - A background/hidden tab will not render YouTube iframes — check playback in a visible tab.
 
 ## Conventions
-- Keep it a single file with no dependencies beyond Leaflet.
+- Keep it to `index.html` + `roads.json` with no dependencies beyond Leaflet.
 - Stage names and colours are Explore Fall's; the Maine classes map onto the same six by prefix.
 - Anything date-specific (`SLIDER_END`, `TRIP`) degrades gracefully: once the dates pass, the slider falls back to today +10 and the trip UI hides itself.

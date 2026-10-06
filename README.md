@@ -13,7 +13,7 @@ Click **ⓘ How it works** on the site for a system diagram and a plain-language
 
 ## How it's built
 
-A single `index.html` using [Leaflet](https://leafletjs.com/). There is no server, build step or API key: the visitor's browser fetches everything fresh on each visit.
+A single `index.html` (plus a static `roads.json`) using [Leaflet](https://leafletjs.com/). There is no server, build step or API key: the visitor's browser fetches everything fresh on each visit.
 
 | Data | Source | Updates |
 |---|---|---|
@@ -21,6 +21,7 @@ A single `index.html` using [Leaflet](https://leafletjs.com/). There is no serve
 | Maine zones | [Maine Forest Service](https://www.maine.gov/dacf/mfs/projects/fall_foliage/report/index.shtml) | Weekly |
 | Webcams | YouTube live streams from their owners' channels | Live |
 | Basemap | Esri Light Gray Canvas | — |
+| Highways and main roads | `roads.json`, a static [OpenStreetMap](https://www.openstreetmap.org/copyright) extract (`tools/build_roads.py`) | Rebuilt by hand |
 
 ## Run locally
 
@@ -36,4 +37,4 @@ Edit `TRIP` and `SLIDER_END` near the top of the script in `index.html`. Destina
 
 ## Credits
 
-Foliage data © Explore Fall. Maine zones © Maine Forest Service. Webcam streams belong to their respective channels. Basemap © Esri and contributors.
+Foliage data © Explore Fall. Maine zones © Maine Forest Service. Webcam streams belong to their respective channels. Basemap © Esri and contributors. Roads © OpenStreetMap contributors.

@@ -163,7 +163,7 @@
       <text x="34" y="60" font-weight="700">Explore Fall</text><text x="34" y="77">One color-coded map image per day</text><text x="34" y="93" fill="#7a6c60">today + forecast · updated daily</text>
       <text x="34" y="138" font-weight="700">Maine Forest Service</text><text x="34" y="155">Official foliage zones (map service)</text><text x="34" y="171" fill="#7a6c60">Maine only · updated weekly</text>
       <text x="34" y="216" font-weight="700">YouTube</text><text x="34" y="233">Latest frame + live player per cam</text><text x="34" y="249" fill="#7a6c60">frame refreshed every 5 minutes</text>
-      <text x="34" y="294" font-weight="700">Esri</text><text x="34" y="311">Background map tiles and labels</text><text x="34" y="327" fill="#7a6c60">static</text>
+      <text x="34" y="294" font-weight="700">Esri · OpenStreetMap</text><text x="34" y="311">Background map, labels and roads</text><text x="34" y="327" fill="#7a6c60">static</text>
       <text x="361" y="62" font-weight="700" font-size="13">One static page + Leaflet</text>
       <text x="361" y="80" fill="#7a6c60">runs entirely on your device</text>
       <text x="361" y="116" font-weight="700">1 · Draw</text><text x="361" y="133">Lay the day's image over the map</text>
@@ -188,7 +188,7 @@
     <tr><td>Color map, stages, outlooks, trip ranking</td><td>Every time the page opens</td><td>Daily (it is a model estimate, not field reports)</td></tr>
     <tr><td>Maine official zones</td><td>Every time the page opens</td><td>Weekly</td></tr>
     <tr><td>Cam thumbnails</td><td>On open, then every 5 minutes</td><td>Live</td></tr>
-    <tr><td>Town list, cam list</td><td>Built into the page</td><td>Edited by hand</td></tr>
+    <tr><td>Town list, cam list, road lines</td><td>Built into the page</td><td>Edited by hand</td></tr>
   </table>
 
   <h3>Good to know</h3>
@@ -434,8 +434,35 @@ const esri = 'https://services.arcgisonline.com/ArcGIS/rest/services/Canvas';   
 L.tileLayer(`${esri}/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}`, { attribution: 'Basemap &copy; Esri, HERE, Garmin, OpenStreetMap contributors', maxZoom: 15 }).addTo(map);
 L.tileLayer(`${esri}/World_Light_Gray_Reference/MapServer/tile/{z}/{y}/{x}`, { pane: 'labels', maxZoom: 15 }).addTo(map);
 // highways and main roads with route shields, transparent so the foliage colours show through
-const roads = L.tileLayer('https://services.arcgisonline.com/ArcGIS/rest/services/Reference/World_Transportation/MapServer/tile/{z}/{y}/{x}',
-  { pane: 'labels', maxZoom: 15, opacity: 0.85 }).addTo(map);
+const roadShields = L.tileLayer('https://services.arcgisonline.com/ArcGIS/rest/services/Reference/World_Transportation/MapServer/tile/{z}/{y}/{x}',
+  { pane: 'labels', maxZoom: 15, opacity: 0.85 });
+// Bold road lines from roads.json (static OpenStreetMap extract, rebuilt with tools/build_roads.py), white-cased so they
+// stay readable over every stage colour. Esri's layer above is kept for the route shields and names.
+map.createPane('roads').style.zIndex = 420;
+map.getPane('roads').style.pointerEvents = 'none';
+const roadCanvas = L.canvas({ pane: 'roads' });
+const ROAD_STYLE = { primary: [1.2, '#6a6a6a', 8], trunk: [1.9, '#3a3a3a', 0], motorway: [2.6, '#1f3554', 0] };   // width, colour, min zoom
+const roadLines = L.layerGroup([], { attribution: 'Roads &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>' });
+const roadGroups = [];
+const roads = L.layerGroup([roadLines, roadShields]).addTo(map);
+const syncRoads = () => roadGroups.forEach(([g, minZoom]) => (map.getZoom() >= minZoom ? roadLines.addLayer(g) : roadLines.removeLayer(g)));
+map.on('zoomend', syncRoads);
+fetch('roads.json').then(r => r.json()).then(data => {
+  for (const cls of ['primary', 'trunk', 'motorway']) {
+    const lines = data[cls].map(f => {                      // delta-encoded [lat, lon] * 1e4
+      let lat = f[0], lon = f[1];
+      const pts = [[lat / 1e4, lon / 1e4]];
+      for (let i = 2; i < f.length; i += 2) { lat += f[i]; lon += f[i + 1]; pts.push([lat / 1e4, lon / 1e4]); }
+      return pts;
+    });
+    const [weight, color, minZoom] = ROAD_STYLE[cls];
+    roadGroups.push([L.layerGroup([
+      L.polyline(lines, { renderer: roadCanvas, color: '#fff', weight: weight + 2.2, opacity: 0.9, interactive: false }),
+      L.polyline(lines, { renderer: roadCanvas, color, weight, interactive: false }),
+    ]), minZoom]);
+  }
+  syncRoads();
+}).catch(() => {});
 
 const foliage = L.imageOverlay(efUrl(today), [[EF_BOUNDS.s, EF_BOUNDS.w], [EF_BOUNDS.n, EF_BOUNDS.e]], {
   pane: 'foliage', opacity: 0.72, crossOrigin: 'anonymous',
