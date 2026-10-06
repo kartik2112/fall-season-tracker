@@ -441,7 +441,7 @@ const roadShields = L.tileLayer('https://services.arcgisonline.com/ArcGIS/rest/s
 map.createPane('roads').style.zIndex = 420;
 map.getPane('roads').style.pointerEvents = 'none';
 const roadCanvas = L.canvas({ pane: 'roads' });
-const ROAD_STYLE = { primary: [1.2, '#6a6a6a', 8], trunk: [1.9, '#3a3a3a', 0], motorway: [2.6, '#1f3554', 0] };   // width, colour, min zoom
+const ROAD_STYLE = { primary: [1.8, '#4a4a4a', 8], trunk: [2.8, '#2b2b2b', 0], motorway: [3.8, '#14263f', 0] };   // width, colour, min zoom
 const roadLines = L.layerGroup([], { attribution: 'Roads &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>' });
 const roadGroups = [];
 const roads = L.layerGroup([roadLines, roadShields]).addTo(map);
@@ -457,7 +457,7 @@ fetch('roads.json').then(r => r.json()).then(data => {
     });
     const [weight, color, minZoom] = ROAD_STYLE[cls];
     roadGroups.push([L.layerGroup([
-      L.polyline(lines, { renderer: roadCanvas, color: '#fff', weight: weight + 2.2, opacity: 0.9, interactive: false }),
+      L.polyline(lines, { renderer: roadCanvas, color: '#fff', weight: weight + 3, opacity: 0.95, interactive: false }),
       L.polyline(lines, { renderer: roadCanvas, color, weight, interactive: false }),
     ]), minZoom]);
   }
