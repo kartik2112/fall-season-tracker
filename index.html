@@ -47,7 +47,25 @@
   .dest .st { color: var(--muted); font-size: 12px; margin-left: 4px; font-weight: 400; }
   .dest .when { font-size: 12px; color: var(--muted); text-align: right; white-space: nowrap; }
   .strip { display: flex; gap: 2px; margin-top: 3px; }
-  .strip i { width: 13px; height: 8px; border-radius: 2px; background: #ddd; }
+  .strip i { width: 9px; height: 8px; border-radius: 2px; background: #ddd; }
+  .strip i.t { box-shadow: 0 3px 0 var(--accent); }
+  .dest .trip { grid-column: 1 / -1; font-size: 12px; margin-top: 3px; }
+  .dest .trip b { color: var(--accent); }
+  .hbtn { border: 1px solid var(--line); background: var(--chip); border-radius: 999px; padding: 4px 12px; font: inherit; font-size: 12px;
+          cursor: pointer; color: var(--ink); white-space: nowrap; }
+  .hbtn:hover { border-color: var(--accent); color: var(--accent); }
+  #info { position: fixed; inset: 0; background: rgba(20,14,10,.6); z-index: 2000; display: none; place-items: center; padding: 16px; }
+  #info.on { display: grid; }
+  #info .box { width: min(900px, 100%); max-height: 92vh; overflow-y: auto; background: var(--panel); border-radius: 12px; padding: 20px 24px 24px; }
+  #info h2 { margin: 0; font-size: 19px; }
+  #info h3 { margin: 18px 0 6px; font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
+  #info p, #info li { margin: 0 0 6px; max-width: 72ch; }
+  #info ul { margin: 0; padding-left: 18px; }
+  #info .top { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 6px; }
+  #info svg { width: 100%; height: auto; display: block; min-width: 640px; }
+  #info .dia { overflow-x: auto; border: 1px solid var(--line); border-radius: 10px; padding: 8px; background: var(--bg); }
+  #info table { border-collapse: collapse; font-size: 13px; width: 100%; }
+  #info td, #info th { text-align: left; padding: 5px 10px 5px 0; border-bottom: 1px solid var(--line); vertical-align: top; }
   .strip i:first-child { outline: 1.5px solid var(--ink); outline-offset: 0; }
   .cams { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
   .cam { cursor: pointer; }
@@ -98,7 +116,9 @@
   <div class="datebox">
     <span id="dateLabel"></span>
     <input id="day" type="range" step="1" aria-label="Map date">
+    <button class="hbtn" id="tripBtn" hidden></button>
   </div>
+  <button class="hbtn" id="infoBtn">ⓘ How it works</button>
   <div class="legend" id="legend"></div>
 </header>
 <div id="map"></div>
@@ -113,6 +133,68 @@
 <div id="modal"><div class="box">
   <div class="player" id="player"></div>
   <div class="bar"><div><b id="mTitle"></b><small id="mSub"></small></div><a id="mLink" target="_blank" rel="noopener">Open on YouTube ↗</a><button id="mClose">Close</button></div>
+</div></div>
+
+<div id="info"><div class="box">
+  <div class="top"><h2>How it works</h2><button class="hbtn" id="infoClose">Close</button></div>
+  <p>A trip-planning map that answers one question: <b>where in New England is the fall color best — today, and on the days I'll be there?</b></p>
+
+  <h3>What you can do</h3>
+  <ul>
+    <li><b>See the color stage</b> of every area on the map, from <i>No color</i> through <i>Peak</i> to <i>Past peak</i>.</li>
+    <li><b>Move the date slider</b> to look back a week or ahead to the end of the forecast window.</li>
+    <li><b>Rank destinations</b> for the selected day or for the planned trip dates; each row shows a day-by-day color strip.</li>
+    <li><b>Check with your own eyes</b>: live webcams near each destination show the latest frame, preview on hover and play on click.</li>
+  </ul>
+
+  <h3>Where the information comes from</h3>
+  <div class="dia"><svg viewBox="0 0 900 400" role="img" aria-label="System diagram: four public sources feed the page in your browser, which draws the map, destination ranking and live cams" font-family="system-ui, sans-serif" font-size="12">
+    <defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#7a6c60"/></marker></defs>
+    <g fill="#7a6c60" font-size="11" font-weight="700" letter-spacing="1"><text x="20" y="22">PUBLIC SOURCES</text><text x="345" y="22">YOUR BROWSER</text><text x="700" y="22">WHAT YOU SEE</text></g>
+    <g fill="#fff" stroke="#d9cdbd" stroke-width="1.5">
+      <rect x="20" y="36" width="250" height="66" rx="9"/><rect x="20" y="114" width="250" height="66" rx="9"/>
+      <rect x="20" y="192" width="250" height="66" rx="9"/><rect x="20" y="270" width="250" height="66" rx="9"/>
+      <rect x="700" y="58" width="180" height="62" rx="9"/><rect x="700" y="155" width="180" height="62" rx="9"/><rect x="700" y="252" width="180" height="62" rx="9"/>
+    </g>
+    <rect x="345" y="36" width="280" height="300" rx="11" fill="#fdf1e7" stroke="#b3401a" stroke-width="2"/>
+    <g fill="#2b211a">
+      <text x="34" y="60" font-weight="700">Explore Fall</text><text x="34" y="77">One color-coded map image per day</text><text x="34" y="93" fill="#7a6c60">today + forecast · updated daily</text>
+      <text x="34" y="138" font-weight="700">Maine Forest Service</text><text x="34" y="155">Official foliage zones (map service)</text><text x="34" y="171" fill="#7a6c60">Maine only · updated weekly</text>
+      <text x="34" y="216" font-weight="700">YouTube</text><text x="34" y="233">Latest frame + live player per cam</text><text x="34" y="249" fill="#7a6c60">frame refreshed every 5 minutes</text>
+      <text x="34" y="294" font-weight="700">Esri</text><text x="34" y="311">Background map tiles and labels</text><text x="34" y="327" fill="#7a6c60">static</text>
+      <text x="361" y="62" font-weight="700" font-size="13">One static page + Leaflet</text>
+      <text x="361" y="80" fill="#7a6c60">runs entirely on your device</text>
+      <text x="361" y="116" font-weight="700">1 · Draw</text><text x="361" y="133">Lay the day's image over the map</text>
+      <text x="361" y="167" font-weight="700">2 · Read</text><text x="361" y="184">Look up the color under each town</text><text x="361" y="200">and cam to get its stage</text>
+      <text x="361" y="234" font-weight="700">3 · Look ahead</text><text x="361" y="251">Repeat for every forecast day to</text><text x="361" y="267">build outlooks and the trip ranking</text>
+      <text x="361" y="301" font-weight="700">4 · Match</text><text x="361" y="318">Attach nearby cams to each town</text>
+      <text x="714" y="84" font-weight="700">Map</text><text x="714" y="102">Color stages by area</text>
+      <text x="714" y="181" font-weight="700">Destinations</text><text x="714" y="199">Ranked, with day strips</text>
+      <text x="714" y="278" font-weight="700">Live cams</text><text x="714" y="296">Thumbnail → video</text>
+    </g>
+    <g stroke="#7a6c60" stroke-width="1.6" fill="none" marker-end="url(#ah)">
+      <path d="M270 69H343"/><path d="M270 147H343"/><path d="M270 225H343"/><path d="M270 303H343"/>
+      <path d="M625 89H698"/><path d="M625 186H698"/><path d="M625 283H698"/>
+    </g>
+    <rect x="20" y="354" width="860" height="34" rx="9" fill="#f3ece2"/>
+    <text x="450" y="376" text-anchor="middle" fill="#2b211a">Hosted on GitHub Pages as a single file — no server, no database, no accounts, no API keys.</text>
+  </svg></div>
+
+  <h3>How fresh is it</h3>
+  <table>
+    <tr><th>Piece</th><th>Fetched</th><th>Source updates</th></tr>
+    <tr><td>Color map, stages, outlooks, trip ranking</td><td>Every time the page opens</td><td>Daily (it is a model estimate, not field reports)</td></tr>
+    <tr><td>Maine official zones</td><td>Every time the page opens</td><td>Weekly</td></tr>
+    <tr><td>Cam thumbnails</td><td>On open, then every 5 minutes</td><td>Live</td></tr>
+    <tr><td>Town list, cam list</td><td>Built into the page</td><td>Edited by hand</td></tr>
+  </table>
+
+  <h3>Good to know</h3>
+  <ul>
+    <li>Forecast days further out are less certain; treat the trip ranking as a guide and confirm on the cams closer to the date.</li>
+    <li>Only Maine has an official layer; the other states rely on the Explore Fall estimate.</li>
+    <li>A cam can go stale if its owner restarts the stream under a new address.</li>
+  </ul>
 </div></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
@@ -139,7 +221,9 @@ const STAGES = [
   { label: 'Past peak',          short: 'Past peak', c: '#4D2B0F' },
 ];
 const RANK = [4, 3, 2, 5, 1, 0];            // best-to-visit order
-const DAYS_BACK = 7, DAYS_AHEAD = 10;
+const DAYS_BACK = 7;
+const SLIDER_END = new Date(2026, 9, 22, 12);                       // last day on the slider (Oct 22)
+const TRIP = { start: new Date(2026, 9, 14, 12), end: new Date(2026, 9, 19, 12) };   // planned trip, Oct 14-19
 
 // name, state, lat, lon
 const DESTS = [
@@ -276,6 +360,13 @@ const addDays = (d, n) => { const x = new Date(d); x.setDate(x.getDate() + n); r
 const ymd = d => `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, '0')}${String(d.getDate()).padStart(2, '0')}`;
 const fmt = (d, o = { weekday: 'short', month: 'short', day: 'numeric' }) => d.toLocaleDateString(undefined, o);
 const efUrl = (d, hi) => `${EF_MAPS}/${d.getFullYear()}${hi ? '-highres' : ''}/${ymd(d)}.png`;
+const dayDiff = d => Math.round((d - today) / 864e5);
+const DAYS_AHEAD = Math.max(10, dayDiff(SLIDER_END));       // today -> SLIDER_END; +10 days once that date has passed
+const tripFrom = Math.max(0, dayDiff(TRIP.start)), tripTo = Math.min(DAYS_AHEAD, dayDiff(TRIP.end));
+const tripOn = tripFrom <= tripTo;                         // some of the trip is still inside the forecast window
+const md = { month: 'short', day: 'numeric' };
+const tripLabel = `${fmt(TRIP.start, md)}–${TRIP.end.getMonth() === TRIP.start.getMonth() ? TRIP.end.getDate() : fmt(TRIP.end, md)}`;
+const endLabel = fmt(addDays(today, DAYS_AHEAD), md);
 let offset = 0;                                   // days from today shown on the map
 
 // ---------------------------------------------------------------- foliage raster sampling
@@ -432,7 +523,7 @@ function openCam(cam) {
 const closeCam = () => { $('#modal').classList.remove('on'); $('#player').replaceChildren(); };
 $('#mClose').onclick = closeCam;
 $('#modal').onclick = e => { if (e.target.id === 'modal') closeCam(); };
-addEventListener('keydown', e => { if (e.key === 'Escape') closeCam(); });
+addEventListener('keydown', e => { if (e.key === 'Escape') { closeCam(); $('#info').classList.remove('on'); } });
 setInterval(() => document.querySelectorAll('img[data-cam]').forEach(i => { i.src = thumb(i.dataset.cam); }), 3e5);
 
 async function checkLive() {
@@ -448,7 +539,8 @@ async function checkLive() {
 }
 
 // ---------------------------------------------------------------- rendering
-let tab = 'dest', state = 'All', onlyGood = false;
+let tab = 'dest', state = 'All', onlyGood = false, sortTrip = tripOn;
+const TRIP_W = [0, 1, 3, 7, 10, 2];                     // how much a trip day in each stage is worth
 const km = (a, b) => { const dy = (a.lat - b.lat) * 111, dx = (a.lon - b.lon) * 111 * Math.cos(a.lat * Math.PI / 180); return Math.hypot(dx, dy); };
 const stageName = s => (STAGES[s] || { label: 'No data' }).label;
 const stageColor = s => (STAGES[s] || { c: '#bbb' }).c;
@@ -462,10 +554,22 @@ function outlook(d) {                                   // one-line "when" from 
   if (p > 0) return `Peak ~${fmt(addDays(today, p), { month: 'short', day: 'numeric' })}`;
   const h = f.findIndex(s => s === 3);
   if (h > 0) return `Near peak ~${fmt(addDays(today, h), { month: 'short', day: 'numeric' })}`;
-  return f[0] === 3 ? 'Near peak now' : `Peak ${DAYS_AHEAD}+ days out`;
+  return f[0] === 3 ? 'Near peak now' : `No peak before ${endLabel}`;
 }
-const strip = d => d.forecast ? `<div class="strip" title="Today → +${DAYS_AHEAD} days">${d.forecast.map((s, i) =>
-  `<i style="background:${stageColor(s)}" title="${fmt(addDays(today, i))}: ${stageName(s)}"></i>`).join('')}</div>` : '';
+const strip = d => d.forecast ? `<div class="strip" title="Today → ${endLabel}">${d.forecast.map((s, i) =>
+  `<i class="${tripOn && i >= tripFrom && i <= tripTo ? 't' : ''}" style="background:${stageColor(s)}" title="${fmt(addDays(today, i))}: ${stageName(s)}"></i>`).join('')}</div>` : '';
+
+function tripInfo(d) {                                  // best stage reached during the trip and how many days it lasts
+  if (!tripOn || !d.forecast) return null;
+  const s = d.forecast.slice(tripFrom, tripTo + 1).filter(x => x >= 0);
+  if (!s.length) return null;
+  const best = RANK.find(r => s.includes(r));
+  return { best, n: s.filter(x => x === best).length, len: s.length, score: s.reduce((a, x) => a + TRIP_W[x], 0) };
+}
+function tripLine(d) {
+  const t = tripInfo(d);
+  return t ? `<div class="trip"><b>Trip ${tripLabel}:</b> <i class="dot" style="background:${stageColor(t.best)}"></i>${STAGES[t.best].short} ${t.n === t.len ? 'all' : `${t.n} of`} ${t.len} days</div>` : '';
+}
 
 function destPopup(d) {
   const el = document.createElement('div');
@@ -473,7 +577,7 @@ function destPopup(d) {
   const me = d.st === 'ME' && maineAt(d.lat, d.lon);
   el.innerHTML = `<h3>${d.name}, ${d.st}</h3>
     <div class="stage"><i class="dot" style="background:${stageColor(d.stage)}"></i>${stageName(d.stage)} <span style="font-weight:400;color:var(--muted)">· ${fmt(addDays(today, offset))}</span></div>
-    <div class="lbl">Next ${DAYS_AHEAD} days · ${outlook(d)}</div>${strip(d)}
+    <div class="lbl">Through ${endLabel} · ${outlook(d)}</div>${strip(d)}${tripLine(d).replace('class="trip"', 'class="me"')}
     ${me ? `<div class="me">Maine Forest Service (official, weekly): <b>${me.FoliageClass}</b> · zone ${me.ZoneName}</div>` : ''}`;
   const near = CAMS.filter(c => km(d, c) < 40).sort((a, b) => km(d, a) - km(d, b)).slice(0, 4);
   if (near.length) {
@@ -501,20 +605,25 @@ function render() {
 
   // sidebar
   $('#filters').innerHTML = ['All', 'NH', 'ME', 'VT', 'MA', 'CT', 'RI'].map(s => `<button data-st="${s}" class="${s === state ? 'on' : ''}">${s}</button>`).join('')
-    + (tab === 'dest' ? `<label><input type="checkbox" id="good" ${onlyGood ? 'checked' : ''}> near peak or peak</label>` : '');
+    + (tab === 'dest' ? `<label><input type="checkbox" id="good" ${onlyGood ? 'checked' : ''}> near peak or peak</label>`
+      + (tripOn ? `<label style="margin-left:0"><input type="checkbox" id="bytrip" ${sortTrip ? 'checked' : ''}> rank for trip</label>` : '') : '');
   const list = $('#list');
   list.replaceChildren();
   const inState = x => state === 'All' || x.st === state;
   const byStage = (a, b) => RANK.indexOf(a.stage) - RANK.indexOf(b.stage) || (a.stage < 0) - (b.stage < 0) || a.name.localeCompare(b.name);
   if (tab === 'dest') {
-    const rows = DESTS.filter(inState).filter(d => !onlyGood || d.stage === 3 || d.stage === 4).sort(byStage);
-    list.insertAdjacentHTML('beforeend', `<div class="note">Sorted best-to-visit for <b>${fmt(addDays(today, offset))}</b>. Bars show today → +${DAYS_AHEAD} days.</div>`);
+    const byTrip = sortTrip && DESTS[0].forecast;
+    const good = d => { const s = byTrip ? (tripInfo(d) || {}).best : d.stage; return s === 3 || s === 4; };
+    const rows = DESTS.filter(inState).filter(d => !onlyGood || good(d))
+      .sort((a, b) => (byTrip ? ((tripInfo(b) || { score: -1 }).score - (tripInfo(a) || { score: -1 }).score) : 0) || byStage(a, b));
+    list.insertAdjacentHTML('beforeend', `<div class="note">${byTrip ? `Ranked for your trip, <b>${tripLabel}</b>` : `Sorted best-to-visit for <b>${fmt(addDays(today, offset))}</b>`}.
+      Bars show today → ${endLabel}${tripOn ? '; underlined days are the trip' : ''}.</div>`);
     if (!rows.length) list.insertAdjacentHTML('beforeend', '<div class="note">Nothing matches — try another state or date.</div>');
     rows.forEach(d => {
       const el = document.createElement('div');
       el.className = 'dest';
       el.innerHTML = `<div><b>${d.name}</b><span class="st">${d.st}</span></div><div class="when">${outlook(d)}</div>
-        <div><i class="dot" style="background:${stageColor(d.stage)}"></i>${stageName(d.stage)}</div><div>${strip(d)}</div>`;
+        <div><i class="dot" style="background:${stageColor(d.stage)}"></i>${stageName(d.stage)}</div><div>${strip(d)}</div>${tripLine(d)}`;
       el.onclick = () => { map.flyTo([d.lat, d.lon], Math.max(map.getZoom(), 9), { duration: 0.6 }); d.marker.openPopup(); };
       list.append(el);
     });
@@ -528,7 +637,7 @@ function render() {
 
 async function showDay() {
   const d = addDays(today, offset);
-  $('#dateLabel').innerHTML = `${fmt(d)} <span>· ${offset === 0 ? 'today' : offset > 0 ? 'forecast' : 'past estimate'}</span>`;
+  $('#dateLabel').innerHTML = `${fmt(d)} <span>· ${offset === 0 ? 'today' : offset > 0 ? 'forecast' : 'past estimate'}${tripOn && offset >= tripFrom && offset <= tripTo ? ' · trip day' : ''}</span>`;
   foliage.setUrl(efUrl(d));                               // light image first, sharp one once it has loaded
   clearTimeout(showDay.t);
   showDay.t = setTimeout(() => { const hi = new Image(); hi.onload = () => { if (addDays(today, offset).getTime() === d.getTime()) foliage.setUrl(hi.src); }; hi.src = efUrl(d, true); }, 400);
@@ -549,11 +658,22 @@ document.querySelector('.tabs').onclick = e => {
   render();
 };
 $('#filters').addEventListener('click', e => { if (e.target.dataset.st) { state = e.target.dataset.st; render(); } });
-$('#filters').addEventListener('change', e => { if (e.target.id === 'good') { onlyGood = e.target.checked; render(); } });
+$('#filters').addEventListener('change', e => {
+  if (e.target.id === 'good') onlyGood = e.target.checked;
+  if (e.target.id === 'bytrip') sortTrip = e.target.checked;
+  render();
+});
+if (tripOn) {
+  Object.assign($('#tripBtn'), { hidden: false, textContent: `Trip ${tripLabel}` });
+  $('#tripBtn').onclick = () => { offset = tripFrom; $('#day').value = offset; showDay(); };
+}
+$('#infoBtn').onclick = () => $('#info').classList.add('on');
+$('#infoClose').onclick = () => $('#info').classList.remove('on');
+$('#info').onclick = e => { if (e.target.id === 'info') $('#info').classList.remove('on'); };
 
 showDay();
 checkLive();
-// forecast strips: sample today..+10 in the background (≈30 KB per day)
+// forecast strips: sample today..SLIDER_END in the background (≈30 KB per day)
 Promise.all(Array.from({ length: DAYS_AHEAD + 1 }, (_, i) => loadDay(i))).then(days => {
   DESTS.forEach(d => { d.forecast = days.map(day => stageAt(day, d.lat, d.lon)); });
   render();
