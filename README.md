@@ -38,3 +38,5 @@ Edit `TRIP` and `SLIDER_END` near the top of the script in `index.html`. Destina
 ## Credits
 
 Foliage data © Explore Fall. Maine zones © Maine Forest Service. Webcam streams belong to their respective channels. Basemap © Esri and contributors. Roads © OpenStreetMap contributors.
+
+`roads.json` is derived from OpenStreetMap data and is made available under the [Open Database License (ODbL)](https://opendatacommons.org/licenses/odbl/1-0/).
