@@ -26,7 +26,7 @@ Live at https://kartik2112.github.io/fall-season-tracker/ — GitHub Pages serve
 - **Maine Forest Service** — ArcGIS FeatureServer layer 2, fields `ZoneName`, `FoliageClass` (`Very Low: 0-10%` … `Peak: 70-100%`, `Past Peak`). Weekly. Geometry is simplified in the query (`maxAllowableOffset=0.01`) to keep it ~100 KB gzipped.
 - **YouTube** — thumbnail `https://i.ytimg.com/vi/<id>/hqdefault_live.jpg` (latest frame); player `youtube-nocookie.com/embed/<id>`. Embeds need an http(s) origin — they fail from `file://`.
 - **Basemap** — Esri `Canvas/World_Light_Gray_Base` + `_Reference` (labels drawn above the foliage layer), plus `Reference/World_Transportation` as the toggleable roads overlay. CARTO basemaps now demand an API key; don't switch back.
-- **Roads** — `roads.json` (~300 KB, ~110 KB gzipped): motorway / trunk / primary lines for the six states, a static OpenStreetMap extract drawn on a canvas with white casing (`ROAD_STYLE`; primary roads appear from zoom 8). Rebuild with `python3 tools/build_roads.py` (Overpass; needs a User-Agent, and only the mail.ru mirror answered this query last time). Esri's `World_Transportation` tiles stay on top for route shields.
+- **Roads** — `roads.json` (~300 KB, ~110 KB gzipped): motorway / trunk / primary lines for the six states, a static OpenStreetMap extract drawn on a canvas with white casing (`ROAD_STYLE`, thinned at low zoom by `roadScale`; primary roads appear from zoom 8). Rebuild with `python3 tools/build_roads.py` (Overpass; needs a User-Agent, and only the mail.ru mirror answered this query last time). Esri's `World_Transportation` tiles stay on top for route shields.
 - No public feed was found for NH; VT and MA were not investigated.
 
 ## Adding or checking cams (fast path)
