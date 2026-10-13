@@ -6,7 +6,8 @@ An interactive map for deciding where to go leaf-peeping in New Hampshire, Maine
 
 - **Color map** — today's foliage stage everywhere (No color → Low → Moderate → Near peak → Peak → Past peak), with a slider to look back a week or ahead through the forecast.
 - **Destinations** — 91 towns ranked for the selected day or for the planned trip dates, each with a day-by-day color strip.
-- **Live cams** — 81 public YouTube webcams; thumbnails show the latest frame, hover to preview, click to watch.
+- **Weather** — daily forecast for every destination (sky, high / low, rain chance and amount, wind and gusts) for the shown day and the trip days, in °C · km/h or °F · mph.
+- **Live cams** — 84 public YouTube webcams; thumbnails show the latest frame, hover to preview, click to watch.
 - **Maine official zones** — the Maine Forest Service weekly report as an optional layer.
 
 Click **ⓘ How it works** on the site for a system diagram and a plain-language summary.
@@ -19,6 +20,7 @@ A single `index.html` (plus a static `roads.json`) using [Leaflet](https://leafl
 |---|---|---|
 | Foliage estimate + forecast | [Explore Fall](https://www.explorefall.com/fall-foliage-map) daily map image | Daily |
 | Maine zones | [Maine Forest Service](https://www.maine.gov/dacf/mfs/projects/fall_foliage/report/index.shtml) | Weekly |
+| Weather forecast | [Open-Meteo](https://open-meteo.com/) daily forecast, one request for all destinations | Hourly |
 | Webcams | YouTube live streams from their owners' channels | Live |
 | Basemap | Esri Light Gray Canvas | — |
 | Highways and main roads | `roads.json`, a static [OpenStreetMap](https://www.openstreetmap.org/copyright) extract (`tools/build_roads.py`) | Rebuilt by hand |
@@ -37,6 +39,6 @@ Edit `TRIP` and `SLIDER_END` near the top of the script in `index.html`. Destina
 
 ## Credits
 
-Foliage data © Explore Fall. Maine zones © Maine Forest Service. Webcam streams belong to their respective channels. Basemap © Esri and contributors. Roads © OpenStreetMap contributors.
+Foliage data © Explore Fall. Maine zones © Maine Forest Service. Weather data by [Open-Meteo.com](https://open-meteo.com/) (CC BY 4.0). Webcam streams belong to their respective channels. Basemap © Esri and contributors. Roads © OpenStreetMap contributors.
 
 `roads.json` is derived from OpenStreetMap data and is made available under the [Open Database License (ODbL)](https://opendatacommons.org/licenses/odbl/1-0/).

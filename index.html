@@ -67,6 +67,14 @@
   #info .dia { overflow-x: auto; border: 1px solid var(--line); border-radius: 10px; padding: 8px; background: var(--bg); }
   #info table { border-collapse: collapse; font-size: 13px; width: 100%; }
   #info td, #info th { text-align: left; padding: 5px 10px 5px 0; border-bottom: 1px solid var(--line); vertical-align: top; }
+  .wx { grid-column: 1 / -1; font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .wx b { color: var(--ink); font-weight: 600; }
+  .wxrow { display: grid; grid-template-columns: repeat(6, 1fr); gap: 3px; margin-top: 4px; }
+  .wxrow div { background: var(--chip); border-radius: 6px; padding: 3px 1px; text-align: center; font-size: 11px; line-height: 1.3; color: var(--muted); }
+  .wxrow div.sel { outline: 1.5px solid var(--accent); }
+  .wxrow span { display: block; font-size: 15px; }
+  .wxrow b { color: var(--ink); font-weight: 600; }
+  .pop .wxnow { font-size: 12px; margin-top: 3px; }
   .strip i:first-child { outline: 1.5px solid var(--ink); outline-offset: 0; }
   .cams { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
   .cam { cursor: pointer; }
@@ -120,6 +128,7 @@
     <button class="hbtn" id="todayBtn">Today</button>
     <button class="hbtn" id="tripBtn" hidden></button>
   </div>
+  <button class="hbtn" id="unitBtn" title="Switch weather units"></button>
   <button class="hbtn" id="infoBtn">ⓘ How it works</button>
   <div class="legend" id="legend"></div>
 </header>
@@ -146,40 +155,43 @@
     <li><b>See the color stage</b> of every area on the map, from <i>No color</i> through <i>Peak</i> to <i>Past peak</i>.</li>
     <li><b>Move the date slider</b> to look back a week or ahead to the end of the forecast window.</li>
     <li><b>Rank destinations</b> for the selected day or for the planned trip dates; each row shows a day-by-day color strip.</li>
+    <li><b>Check the weather</b>: each destination shows the daily forecast (sky, high / low, rain, wind) for the selected day and the trip days, in °C or °F.</li>
     <li><b>Check with your own eyes</b>: live webcams near each destination show the latest frame, preview on hover and play on click.</li>
   </ul>
 
   <h3>Where the information comes from</h3>
-  <div class="dia"><svg viewBox="0 0 900 400" role="img" aria-label="System diagram: four public sources feed the page in your browser, which draws the map, destination ranking and live cams" font-family="system-ui, sans-serif" font-size="12">
+  <div class="dia"><svg viewBox="0 0 900 478" role="img" aria-label="System diagram: five public sources feed the page in your browser, which draws the map, destination ranking and live cams" font-family="system-ui, sans-serif" font-size="12">
     <defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#7a6c60"/></marker></defs>
     <g fill="#7a6c60" font-size="11" font-weight="700" letter-spacing="1"><text x="20" y="22">PUBLIC SOURCES</text><text x="345" y="22">YOUR BROWSER</text><text x="700" y="22">WHAT YOU SEE</text></g>
     <g fill="#fff" stroke="#d9cdbd" stroke-width="1.5">
       <rect x="20" y="36" width="250" height="66" rx="9"/><rect x="20" y="114" width="250" height="66" rx="9"/>
-      <rect x="20" y="192" width="250" height="66" rx="9"/><rect x="20" y="270" width="250" height="66" rx="9"/>
-      <rect x="700" y="58" width="180" height="62" rx="9"/><rect x="700" y="155" width="180" height="62" rx="9"/><rect x="700" y="252" width="180" height="62" rx="9"/>
+      <rect x="20" y="192" width="250" height="66" rx="9"/><rect x="20" y="270" width="250" height="66" rx="9"/><rect x="20" y="348" width="250" height="66" rx="9"/>
+      <rect x="700" y="97" width="180" height="62" rx="9"/><rect x="700" y="194" width="180" height="62" rx="9"/><rect x="700" y="291" width="180" height="62" rx="9"/>
     </g>
-    <rect x="345" y="36" width="280" height="300" rx="11" fill="#fdf1e7" stroke="#b3401a" stroke-width="2"/>
+    <rect x="345" y="36" width="280" height="378" rx="11" fill="#fdf1e7" stroke="#b3401a" stroke-width="2"/>
     <g fill="#2b211a">
       <text x="34" y="60" font-weight="700">Explore Fall</text><text x="34" y="77">One color-coded map image per day</text><text x="34" y="93" fill="#7a6c60">today + forecast · updated daily</text>
       <text x="34" y="138" font-weight="700">Maine Forest Service</text><text x="34" y="155">Official foliage zones (map service)</text><text x="34" y="171" fill="#7a6c60">Maine only · updated weekly</text>
       <text x="34" y="216" font-weight="700">YouTube</text><text x="34" y="233">Latest frame + live player per cam</text><text x="34" y="249" fill="#7a6c60">frame refreshed every 5 minutes</text>
       <text x="34" y="294" font-weight="700">Esri · OpenStreetMap</text><text x="34" y="311">Background map, labels and roads</text><text x="34" y="327" fill="#7a6c60">static</text>
+      <text x="34" y="372" font-weight="700">Open-Meteo</text><text x="34" y="389">Daily weather forecast per town</text><text x="34" y="405" fill="#7a6c60">16 days ahead · updated hourly</text>
       <text x="361" y="62" font-weight="700" font-size="13">One static page + Leaflet</text>
       <text x="361" y="80" fill="#7a6c60">runs entirely on your device</text>
       <text x="361" y="116" font-weight="700">1 · Draw</text><text x="361" y="133">Lay the day's image over the map</text>
       <text x="361" y="167" font-weight="700">2 · Read</text><text x="361" y="184">Look up the color under each town</text><text x="361" y="200">and cam to get its stage</text>
       <text x="361" y="234" font-weight="700">3 · Look ahead</text><text x="361" y="251">Repeat for every forecast day to</text><text x="361" y="267">build outlooks and the trip ranking</text>
       <text x="361" y="301" font-weight="700">4 · Match</text><text x="361" y="318">Attach nearby cams to each town</text>
-      <text x="714" y="84" font-weight="700">Map</text><text x="714" y="102">Color stages by area</text>
-      <text x="714" y="181" font-weight="700">Destinations</text><text x="714" y="199">Ranked, with day strips</text>
-      <text x="714" y="278" font-weight="700">Live cams</text><text x="714" y="296">Thumbnail → video</text>
+      <text x="361" y="352" font-weight="700">5 · Weather</text><text x="361" y="369">Attach each town's daily forecast</text><text x="361" y="385">for the shown day and the trip</text>
+      <text x="714" y="123" font-weight="700">Map</text><text x="714" y="141">Color stages by area</text>
+      <text x="714" y="220" font-weight="700">Destinations</text><text x="714" y="238">Ranked, strips + weather</text>
+      <text x="714" y="317" font-weight="700">Live cams</text><text x="714" y="335">Thumbnail → video</text>
     </g>
     <g stroke="#7a6c60" stroke-width="1.6" fill="none" marker-end="url(#ah)">
-      <path d="M270 69H343"/><path d="M270 147H343"/><path d="M270 225H343"/><path d="M270 303H343"/>
-      <path d="M625 89H698"/><path d="M625 186H698"/><path d="M625 283H698"/>
+      <path d="M270 69H343"/><path d="M270 147H343"/><path d="M270 225H343"/><path d="M270 303H343"/><path d="M270 381H343"/>
+      <path d="M625 128H698"/><path d="M625 225H698"/><path d="M625 322H698"/>
     </g>
-    <rect x="20" y="354" width="860" height="34" rx="9" fill="#f3ece2"/>
-    <text x="450" y="376" text-anchor="middle" fill="#2b211a">Hosted on GitHub Pages as a single file — no server, no database, no accounts, no API keys.</text>
+    <rect x="20" y="432" width="860" height="34" rx="9" fill="#f3ece2"/>
+    <text x="450" y="454" text-anchor="middle" fill="#2b211a">Hosted on GitHub Pages as a single file — no server, no database, no accounts, no API keys.</text>
   </svg></div>
 
   <h3>How fresh is it</h3>
@@ -187,6 +199,7 @@
     <tr><th>Piece</th><th>Fetched</th><th>Source updates</th></tr>
     <tr><td>Color map, stages, outlooks, trip ranking</td><td>Every time the page opens</td><td>Daily (it is a model estimate, not field reports)</td></tr>
     <tr><td>Maine official zones</td><td>Every time the page opens</td><td>Weekly</td></tr>
+    <tr><td>Weather forecast</td><td>Every time the page opens</td><td>Hourly (Open-Meteo, 16 days ahead)</td></tr>
     <tr><td>Cam thumbnails</td><td>On open, then every 5 minutes</td><td>Live</td></tr>
     <tr><td>Town list, cam list, road lines</td><td>Built into the page</td><td>Edited by hand</td></tr>
   </table>
@@ -194,6 +207,7 @@
   <h3>Good to know</h3>
   <ul>
     <li>Forecast days further out are less certain; treat the trip ranking as a guide and confirm on the cams closer to the date.</li>
+    <li>Weather is a point forecast at each town. Mountain summits and passes (Kancamagus, Cadillac Mountain) are colder and windier than the town value.</li>
     <li>Only Maine has an official layer; the other states rely on the Explore Fall estimate.</li>
     <li>A cam can go stale if its owner restarts the stream under a new address.</li>
   </ul>
@@ -213,6 +227,10 @@ const NE_BOX = { w: -74.2, e: -66.5, n: 47.7, s: 40.4 };      // part of the ima
 // Maine Forest Service official weekly foliage zones (ArcGIS feature service, public)
 const MAINE_ZONES = 'https://services1.arcgis.com/RbMX0mRVOFNTdLzd/arcgis/rest/services/Foliage_Map_view/FeatureServer/2/query'
   + '?where=1%3D1&outFields=ZoneName,FoliageClass&outSR=4326&maxAllowableOffset=0.01&geometryPrecision=3&f=geojson';
+
+// Open-Meteo daily forecast: free, no key, CORS-enabled, CC BY 4.0. One request covers every destination.
+const WX_API = 'https://api.open-meteo.com/v1/forecast';
+const WX_DAILY = 'weather_code,temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,wind_speed_10m_max,wind_gusts_10m_max';
 
 const STAGES = [
   { label: 'Little to no color', short: 'No color',  c: '#689C4B' },
@@ -279,12 +297,11 @@ const CAMS = [
   ['Z27ghRYocJ4', 'Mount Washington – Observatory deck', 'NH', 44.2706, -71.3033, 'Mount Washington Observatory'],
   ['JuJVUhj9JBo', 'Mount Washington – Observatory tower', 'NH', 44.2712, -71.3026, 'Mount Washington Observatory'],
   ['V1933u4lyQY', 'Cog Railway – Waumbek station', 'NH', 44.2715, -71.3300, 'Mount Washington Observatory'],
-  ['b8_cqejTHxs', 'Mount Washington Cog Railway base', 'NH', 44.2697, -71.3508, 'Mount Washington Cog Railway'],
+  ['a2caK9xSwMI', 'Mount Washington Cog Railway base', 'NH', 44.2697, -71.3508, 'Mount Washington Cog Railway'],
   ['dk8UdsE-BNQ', 'Attitash Mountain Village, Bartlett', 'NH', 44.0828, -71.2294, 'Boston and Maine Live'],
   ['H8bFFw-0ZQE', 'North Conway village', 'NH', 44.0537, -71.1284, 'Boston and Maine Live'],
   ['3w3tepBwtRI', 'Conway Scenic Railroad', 'NH', 44.0520, -71.1296, 'Boston and Maine Live'],
   ['TMwZInXDfvI', 'Cranmore Mountain', 'NH', 44.0568, -71.1100, 'Mount Washington Observatory'],
-  ['2XptTNJC0ZU', 'Chocorua Lake', 'NH', 43.9050, -71.2330, 'Boston and Maine Live'],
   ['wNxk-XC8Z5s', 'First Connecticut Lake, Pittsburg', 'NH', 45.0960, -71.2880, 'Lopstick'],
   ['PJR_aGTEcgs', 'Dublin – Yankee Magazine HQ', 'NH', 42.9070, -72.0620, 'Yankee Publishing'],
   ['LkZZTkRHLVQ', 'Portsmouth – Market Square', 'NH', 43.0772, -70.7575, 'Boston and Maine Live'],
@@ -294,6 +311,7 @@ const CAMS = [
   ['QOzzOXbGcMU', 'Katahdin from 5 Lakes Lodge', 'ME', 45.6150, -68.7900, 'Boston and Maine Live'],
   ['LllTVXeOo10', 'Moosehead Lake – Rockwood', 'ME', 45.6790, -69.7400, 'Boston and Maine Live'],
   ['MyOJPk-HSeI', 'Moosehead Lake – Blair Hill Inn, Greenville', 'ME', 45.4700, -69.5980, 'Boston and Maine Live'],
+  ['sGrMkMV26Uw', 'Big Moose Mountain, Greenville Junction', 'ME', 45.4330, -69.6880, 'Boston and Maine Live'],
   ['fLT0G1R9S5o', 'Greenville Junction rail depot', 'ME', 45.4640, -69.6150, 'Boston and Maine Live'],
   ['Vz3pCfSinek', 'Monson', 'ME', 45.2870, -69.5010, 'Boston and Maine Live'],
   ['BkAFEnQBnfg', 'Jackman airport', 'ME', 45.6320, -70.2470, 'Boston and Maine Live'],
@@ -320,15 +338,18 @@ const CAMS = [
   ['JHEmvHrNfJg', 'Westfield – Park Square', 'MA', 42.1210, -72.7490, 'Boston and Maine Live'],
   ['PNJXkOaQD1I', 'Shrewsbury – pond and trees', 'MA', 42.2959, -71.7128, 'Boston and Maine Live'],
   ['-xH-9TxpRY8', 'Marlborough', 'MA', 42.3459, -71.5523, 'WMCT-TV'],
+  ['wPCrbAjyl6U', 'Boston Common', 'MA', 42.3550, -71.0656, 'Third Polar Arch'],
   ['exkU6Rjn0vM', 'Boston – Charles River from the Green Line', 'MA', 42.3665, -71.0680, 'Boston and Maine Live'],
   ['3I_cIS24AfY', 'Boston Harbor', 'MA', 42.3585, -71.0230, 'Boston and Maine Live'],
   ['IMUXzqo75Sk', 'Newburyport waterfront', 'MA', 42.8125, -70.8690, 'Newburyport.com'],
   ['Y0BRntF3178', 'Martha\'s Vineyard', 'MA', 41.4560, -70.5580, 'Go Martha\'s Vineyard'],
-  ['bTRqQe0uWdM', 'Mount Washington from Wildcat', 'NH', 44.2640, -71.2390, 'Mount Washington Observatory'],
+  ['yltH00ncpZA', 'Mount Washington from Wildcat', 'NH', 44.2640, -71.2390, 'Mount Washington Observatory'],
   ['vnIMx_ONGu4', 'Hanover – Dartmouth Green', 'NH', 43.7022, -72.2885, 'Dartmouth College Webcams'],
   ['ohJeIx8vqZo', 'Lake Winnisquam (Lakes Region)', 'NH', 43.5050, -71.5150, 'Winnisquam Marine'],
   ['NYfXOUPjSNI', 'Pats Peak, Henniker', 'NH', 43.1590, -71.7960, 'Pats Peak Ski Area'],
   ['jZEvrGZ_8y0', 'Hampton Beach', 'NH', 42.9076, -70.8117, 'Hampton Beach - Official'],
+  ['M0I8-jQAtLA', 'King Pine summit, East Madison', 'NH', 43.8720, -71.0910, 'Boston and Maine Live'],
+  ['5r8fLrwuqoU', 'Wolfeboro – Main Street and the bay', 'NH', 43.5850, -71.2080, 'Wolfeboro Bay Real Estate'],
   ['AtXgvVaqy88', 'Sunday River – Jordan 8', 'ME', 44.4640, -70.9000, 'Sunday River'],
   ['J98tW5YX4Z8', 'Sunday River – Peak Lodge', 'ME', 44.4680, -70.8590, 'Sunday River'],
   ['MOBWD8WBiD4', 'Mooselookmeguntic Lake (Rangeley)', 'ME', 44.9000, -70.8000, 'Boston and Maine Live'],
@@ -370,6 +391,54 @@ const md = { month: 'short', day: 'numeric' };
 const tripLabel = `${fmt(TRIP.start, md)}–${TRIP.end.getMonth() === TRIP.start.getMonth() ? TRIP.end.getDate() : fmt(TRIP.end, md)}`;
 const endLabel = fmt(addDays(today, DAYS_AHEAD), md);
 let offset = 0;                                   // days from today shown on the map
+
+// ---------------------------------------------------------------- weather (Open-Meteo)
+let wxUnit = 'C';
+try { if (localStorage.getItem('wxUnit') === 'F') wxUnit = 'F'; } catch {}
+const WX_CODES = [                                 // WMO weather code (upper bound) -> icon, text
+  [0, '☀️', 'Clear'], [1, '🌤️', 'Mostly clear'], [2, '⛅', 'Partly cloudy'], [3, '☁️', 'Overcast'], [48, '🌫️', 'Fog'],
+  [55, '🌦️', 'Drizzle'], [57, '🌧️', 'Freezing drizzle'], [61, '🌦️', 'Light rain'], [63, '🌧️', 'Rain'], [65, '🌧️', 'Heavy rain'],
+  [67, '🌧️', 'Freezing rain'], [75, '🌨️', 'Snow'], [77, '🌨️', 'Snow grains'], [82, '🌦️', 'Rain showers'], [86, '🌨️', 'Snow showers'],
+  [99, '⛈️', 'Thunderstorm'],
+];
+const wxCode = c => WX_CODES.find(([max]) => c <= max) || [0, '·', 'No data'];
+const tmp = c => c == null ? '–' : `${Math.round(wxUnit === 'F' ? c * 9 / 5 + 32 : c)}°`;
+const spd = k => k == null ? '–' : wxUnit === 'F' ? `${Math.round(k / 1.609)} mph` : `${Math.round(k)} km/h`;
+const mm = v => v == null ? '–' : wxUnit === 'F' ? `${(v / 25.4).toFixed(2)} in` : `${v.toFixed(1)} mm`;
+const pct = v => v == null ? '' : `${v}%`;
+const wxAt = (d, off) => d.wx && d.wx[ymd(addDays(today, off))];
+const wxTitle = (w, off) => `${fmt(addDays(today, off))}: ${wxCode(w.code)[2]}, ${tmp(w.hi)} / ${tmp(w.lo)}${wxUnit}, rain ${mm(w.mm)}${w.pop != null ? ` (${w.pop}%)` : ''}, wind ${spd(w.wind)}, gusts ${spd(w.gust)}`;
+
+function loadWeather() {                          // one request, every destination; data kept in °C / km/h / mm
+  const q = `latitude=${DESTS.map(d => d.lat.toFixed(3)).join(',')}&longitude=${DESTS.map(d => d.lon.toFixed(3)).join(',')}`
+    + `&daily=${WX_DAILY}&timezone=America%2FNew_York&past_days=${DAYS_BACK}&forecast_days=16&wind_speed_unit=kmh`;
+  return fetch(`${WX_API}?${q}`).then(r => r.ok ? r.json() : Promise.reject(r.status)).then(js => {
+    [].concat(js).forEach((w, i) => {
+      const t = w.daily, d = DESTS[i];
+      d.wx = {};
+      t.time.forEach((day, k) => {
+        d.wx[day.replace(/-/g, '')] = { code: t.weather_code[k], hi: t.temperature_2m_max[k], lo: t.temperature_2m_min[k], mm: t.precipitation_sum[k],
+          pop: t.precipitation_probability_max[k], wind: t.wind_speed_10m_max[k], gust: t.wind_gusts_10m_max[k] };
+      });
+    });
+    render();
+  }).catch(() => {});
+}
+const wxLine = d => {                             // sidebar: weather on the shown day
+  const w = wxAt(d, offset);
+  return w ? `<div class="wx" title="${wxTitle(w, offset)}">${wxCode(w.code)[1]} <b>${tmp(w.hi)} / ${tmp(w.lo)}${wxUnit}</b> · ${wxCode(w.code)[2]}${w.pop != null ? ` · 💧 ${w.pop}%` : ''} · 💨 ${spd(w.wind)}</div>` : '';
+};
+function wxBlock(d) {                             // popup: shown day in full, then six days (the trip, or from the shown day)
+  const w = wxAt(d, offset);
+  if (!w) return '';
+  const start = tripOn ? tripFrom : offset;
+  const days = Array.from({ length: 6 }, (_, i) => start + i).filter(o => wxAt(d, o));
+  const label = tripOn ? `Weather · trip ${tripLabel}` : 'Weather · next days';
+  return `<div class="lbl">Weather · ${fmt(addDays(today, offset))}</div>
+    <div class="wxnow">${wxCode(w.code)[1]} <b>${wxCode(w.code)[2]}</b>, ${tmp(w.hi)} / ${tmp(w.lo)}${wxUnit} · rain ${mm(w.mm)}${w.pop != null ? ` (${w.pop}%)` : ''} · wind ${spd(w.wind)}, gusts ${spd(w.gust)}</div>
+    ${days.length ? `<div class="lbl">${label}</div><div class="wxrow">${days.map(o => { const x = wxAt(d, o);
+      return `<div class="${o === offset ? 'sel' : ''}" title="${wxTitle(x, o)}">${fmt(addDays(today, o), { weekday: 'short' })}<span>${wxCode(x.code)[1]}</span><b>${tmp(x.hi)}</b>/${tmp(x.lo)}<br>${x.pop != null ? `💧${x.pop}%` : mm(x.mm)}</div>`; }).join('')}</div>` : ''}`;
+}
 
 // ---------------------------------------------------------------- foliage raster sampling
 const mercY = lat => Math.log(Math.tan(Math.PI / 4 + lat * Math.PI / 360));
@@ -617,7 +686,7 @@ function destPopup(d) {
   el.innerHTML = `<h3>${d.name}, ${d.st}</h3>
     <div class="stage"><i class="dot" style="background:${stageColor(d.stage)}"></i>${stageName(d.stage)} <span style="font-weight:400;color:var(--muted)">· ${fmt(addDays(today, offset))}</span></div>
     <div class="lbl">Through ${endLabel} · ${outlook(d)}</div>${strip(d)}${tripLine(d).replace('class="trip"', 'class="me"')}
-    ${me ? `<div class="me">Maine Forest Service (official, weekly): <b>${me.FoliageClass}</b> · zone ${me.ZoneName}</div>` : ''}`;
+    ${me ? `<div class="me">Maine Forest Service (official, weekly): <b>${me.FoliageClass}</b> · zone ${me.ZoneName}</div>` : ''}${wxBlock(d)}`;
   const near = CAMS.filter(c => km(d, c) < 40).sort((a, b) => km(d, a) - km(d, b)).slice(0, 4);
   if (near.length) {
     el.insertAdjacentHTML('beforeend', '<div class="lbl">Live cams nearby</div>');
@@ -656,13 +725,13 @@ function render() {
     const rows = DESTS.filter(inState).filter(d => !onlyGood || good(d))
       .sort((a, b) => (byTrip ? ((tripInfo(b) || { score: -1 }).score - (tripInfo(a) || { score: -1 }).score) : 0) || byStage(a, b));
     list.insertAdjacentHTML('beforeend', `<div class="note">${byTrip ? `Ranked for your trip, <b>${tripLabel}</b>` : `Sorted best-to-visit for <b>${fmt(addDays(today, offset))}</b>`}.
-      Bars show today → ${endLabel}${tripOn ? '; underlined days are the trip' : ''}.</div>`);
+      Bars show today → ${endLabel}${tripOn ? '; underlined days are the trip' : ''}. Weather is for the shown day.</div>`);
     if (!rows.length) list.insertAdjacentHTML('beforeend', '<div class="note">Nothing matches — try another state or date.</div>');
     rows.forEach(d => {
       const el = document.createElement('div');
       el.className = 'dest';
       el.innerHTML = `<div><b>${d.name}</b><span class="st">${d.st}</span></div><div class="when">${outlook(d)}</div>
-        <div><i class="dot" style="background:${stageColor(d.stage)}"></i>${stageName(d.stage)}</div><div>${strip(d)}</div>${tripLine(d)}`;
+        <div><i class="dot" style="background:${stageColor(d.stage)}"></i>${stageName(d.stage)}</div><div>${strip(d)}</div>${tripLine(d)}${wxLine(d)}`;
       el.onclick = () => { map.flyTo([d.lat, d.lon], Math.max(map.getZoom(), 9), { duration: 0.6 }); d.marker.openPopup(); };
       list.append(el);
     });
@@ -707,12 +776,21 @@ if (tripOn) {
   $('#tripBtn').onclick = () => { offset = tripFrom; $('#day').value = offset; showDay(); };
 }
 $('#todayBtn').onclick = () => { offset = 0; $('#day').value = 0; showDay(); };
+const setUnit = u => { wxUnit = u; $('#unitBtn').textContent = u === 'F' ? '°F · mph' : '°C · km/h'; };
+setUnit(wxUnit);
+$('#unitBtn').onclick = () => {
+  setUnit(wxUnit === 'C' ? 'F' : 'C');
+  try { localStorage.setItem('wxUnit', wxUnit); } catch {}
+  map.closePopup(); render();
+};
+map.attributionControl.addAttribution('Weather: <a href="https://open-meteo.com/">Open-Meteo</a>');
 $('#infoBtn').onclick = () => $('#info').classList.add('on');
 $('#infoClose').onclick = () => $('#info').classList.remove('on');
 $('#info').onclick = e => { if (e.target.id === 'info') $('#info').classList.remove('on'); };
 
 showDay();
 checkLive();
+loadWeather();
 // forecast strips: sample today..SLIDER_END in the background (≈30 KB per day)
 Promise.all(Array.from({ length: DAYS_AHEAD + 1 }, (_, i) => loadDay(i))).then(days => {
   DESTS.forEach(d => { d.forecast = days.map(day => stageAt(day, d.lat, d.lon)); });
